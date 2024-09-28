@@ -1,0 +1,4 @@
+main: com.kzics.vupgrader.VUpgrader
+version: 1.0.0
+name: vUpgrader
+api-version: 1.18
