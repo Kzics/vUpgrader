@@ -44,9 +44,6 @@ public class ItemSelectionMenu extends UpgraderHolder {
         if (clickedItem == null || clickedItem.getItemMeta() == null) return;
         if (!clickedItem.getItemMeta().getPersistentDataContainer().has(ItemUpgradeService.key, PersistentDataType.INTEGER)) return;
 
-        int upgradeLevel = clickedItem.getItemMeta().getPersistentDataContainer().get(ItemUpgradeService.key, PersistentDataType.INTEGER);
-        IUpgrade upgrade = VUpgrader.getInstance().getUpgradePathManager().getUpgradePath("helmet").getUpgradeForLevel(upgradeLevel);
-
         int clickedSlot = event.getSlot();
         ItemStack inventoryItem = null;
 
@@ -55,7 +52,7 @@ public class ItemSelectionMenu extends UpgraderHolder {
                 inventoryItem = stack;
             }
         }
-        new UpgraderMenu(upgrade, inventoryItem).open(player);
+        new UpgraderMenu(inventoryItem).open(player);
 
         List<ItemStack> upgradeableItems = getUpgradeableItems(player);
         int totalPages = (int) Math.ceil((double) upgradeableItems.size() / MAX_ITEMS_PER_PAGE);

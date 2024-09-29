@@ -5,7 +5,6 @@ import com.kzics.vupgrader.menu.UpgraderHolder;
 import com.kzics.vupgrader.services.ItemUpgradeService;
 import com.kzics.vupgrader.upgrades.IUpgrade;
 import com.kzics.vupgrader.upgrades.ResourceRequirements;
-import com.kzics.vupgrader.upgrades.Upgrade;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,13 +18,11 @@ import java.util.List;
 public class UpgraderMenu extends UpgraderHolder {
 
     private final int[] UPGRADE_REQ_SLOT = {29, 30, 31, 32, 33, 38, 39, 40, 41, 42};
-    private final IUpgrade upgrade;
     private final VUpgrader vUpgrader;
     private final ItemStack upgradedItem;
 
-    public UpgraderMenu(IUpgrade upgrade, ItemStack upgradedItem) {
+    public UpgraderMenu(ItemStack upgradedItem) {
         super("Upgrade Menu", 54);
-        this.upgrade = upgrade;
         this.vUpgrader = VUpgrader.getInstance();
         this.upgradedItem = upgradedItem;
     }
@@ -35,11 +32,10 @@ public class UpgraderMenu extends UpgraderHolder {
         inventory.clear();
 
         int level = getItemLevel(upgradedItem);
-        System.out.println(level);
+        String pathName = upgradedItem.getItemMeta().getPersistentDataContainer().get(ItemUpgradeService.nameKey, PersistentDataType.STRING);
 
-        // Récupère l'upgrade pour le niveau suivant, ou null si elle n'existe pas
         IUpgrade nextUpgrade = vUpgrader.getUpgradePathManager()
-                .getUpgradePath("helmet")
+                .getUpgradePath(pathName)
                 .getUpgradeForLevel(level + 1);
 
         inventory.setItem(12, upgradedItem);
@@ -53,9 +49,8 @@ public class UpgraderMenu extends UpgraderHolder {
             ResourceRequirements requiredMaterials = nextUpgrade.getRequirements();
             displayRequiredMaterials(requiredMaterials.getRequiredItems());
         } else {
-            inventory.setItem(14, new ItemStack(Material.BARRIER));  // Par exemple, une barrière pour indiquer le max level
+            inventory.setItem(14, new ItemStack(Material.BARRIER));
         }
-
         player.openInventory(inventory);
     }
 
@@ -67,12 +62,13 @@ public class UpgraderMenu extends UpgraderHolder {
         int slot = event.getSlot();
 
         if (slot == 13) {
-          IUpgrade newUpgrade = vUpgrader.getItemUpgradeService().upgradeItem(player, upgradedItem, "helmet");
+            String pathName = upgradedItem.getItemMeta().getPersistentDataContainer().get(ItemUpgradeService.nameKey, PersistentDataType.STRING);
+
+            IUpgrade newUpgrade = vUpgrader.getItemUpgradeService().upgradeItem(player, upgradedItem, pathName);
           if (newUpgrade != null) {
-            //replaceItemInInventory(player, upgradedItem, newUpgrade.getItem());
 
             player.sendMessage("§aUpgrade réussi !");
-            new UpgraderMenu(newUpgrade, upgradedItem).open(player);
+            new UpgraderMenu(upgradedItem).open(player);
           } else {
               player.sendMessage("§cPas assez de matériaux requis pour l'upgrade !");
           }
@@ -109,13 +105,6 @@ public class UpgraderMenu extends UpgraderHolder {
         }
         return button;
     }
-
-
-
-    private boolean canUpgrade(Player player) {
-        return true;
-    }
-
 
     public int getItemLevel(ItemStack itemStack) {
         return itemStack.getItemMeta().getPersistentDataContainer().get(ItemUpgradeService.key, PersistentDataType.INTEGER);
