@@ -34,6 +34,8 @@ public class AdminUpgradesMenu extends UpgraderHolder {
             itemStack.setItemMeta(meta);
             inventory.addItem(itemStack);
         }
+
+        player.openInventory(inventory);
     }
 
     @Override
@@ -47,7 +49,7 @@ public class AdminUpgradesMenu extends UpgraderHolder {
         String pathName = clickedItem.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
         UpgradePath path = upgradePathManager.getUpgradePath(pathName);
 
-        new AdminUpgradePathMenu(path).open();
+        new AdminUpgradePathMenu(path).open(player);
     }
 
     @Override

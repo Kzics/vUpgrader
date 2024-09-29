@@ -2,12 +2,14 @@ package com.kzics.vupgrader.listeners;
 
 import com.kzics.vupgrader.VUpgrader;
 import com.kzics.vupgrader.items.UpgraderItem;
+import com.kzics.vupgrader.menu.impl.AdminUpgradesMenu;
 import com.kzics.vupgrader.menu.impl.ItemSelectionMenu;
 import com.kzics.vupgrader.services.ItemUpgradeService;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -33,5 +35,10 @@ public class PlayerListeners implements Listener {
             String pathName = upgraderItem.getItemMeta().getPersistentDataContainer().get(ItemUpgradeService.nameKey, PersistentDataType.STRING);
             new ItemSelectionMenu().open(player);
         }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event){
+        new AdminUpgradesMenu(vUpgrader.getUpgradePathManager()).open(event.getPlayer());
     }
 }

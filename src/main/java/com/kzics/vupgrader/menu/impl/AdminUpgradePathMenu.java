@@ -2,6 +2,7 @@ package com.kzics.vupgrader.menu.impl;
 
 import com.kzics.vupgrader.VUpgrader;
 import com.kzics.vupgrader.menu.UpgraderHolder;
+import com.kzics.vupgrader.services.ItemUpgradeService;
 import com.kzics.vupgrader.upgrades.IUpgrade;
 import com.kzics.vupgrader.upgrades.UpgradePath;
 import org.bukkit.Material;
@@ -33,11 +34,29 @@ public class AdminUpgradePathMenu extends UpgraderHolder {
         addItem.setItemMeta(meta);
 
         inventory.addItem(addItem);
+
+        player.openInventory(inventory);
+
     }
 
-    @Override
     public void handle(InventoryClickEvent event) {
+        event.setCancelled(true);
 
+        int slot = event.getSlot();
+        final Player player = (Player) event.getWhoClicked();
+        final ItemStack itemStack = event.getCurrentItem();
+
+        if(itemStack == null || itemStack.getItemMeta() == null) return;
+
+
+        if(itemStack.getItemMeta().getPersistentDataContainer().has(addItemKey, PersistentDataType.STRING)){
+            new AddUpgradeMenu(upgradePath).open(player);
+            return;
+        }
+
+        IUpgrade upgrade = upgradePath.getUpgradeForLevel(slot);
+
+        upgrade.getRequirements().getRequiredItems().forEach(it-> player.sendMessage(it.getType().name()));
     }
 
     @Override
